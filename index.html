@@ -3,17 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Python WebAssembly App</title>
+    <title>Pokémon Ranking Game</title>
     <script src="https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js"></script>
     <link rel="stylesheet" href="style.css">
     <link rel="icon" href="generated-icon.png">
 </head>
 <body>
     <div id="app">
-        <h1>Python WebAssembly App</h1>
-        <div id="output" class="terminal"></div>
+        <h1>Pokémon Ranking Game</h1>
         <div id="loading">Loading Python environment...</div>
+        
+        <!-- Game Container -->
+        <div id="game-container" style="display: none;">
+            <!-- Starter Page -->
+            <div id="starter-page" class="game-page">
+                <h2>Welcome!</h2>
+                <p>Choose a mode to begin ranking Pokémon by their attack strength!</p>
+                <div class="button-container">
+                    <button id="easy-btn" class="mode-btn">Easy</button>
+                    <button id="medium-btn" class="mode-btn">Medium</button>
+                    <button id="hard-btn" class="mode-btn">Hard</button>
+                </div>
+            </div>
+            
+            <!-- Rankings Page -->
+            <div id="rankings-page" class="game-page" style="display: none;">
+                <h2 id="mode-display">Mode: Easy - Level 1/3</h2>
+                <p id="points-display">Points: 0</p>
+                <p>Put these Pokémon in order of attack strength (strongest to weakest):</p>
+                
+                <div id="pokemon-list"></div>
+                
+                <div id="ranking-input">
+                    <p class="hint">Example: Pikachu, Bulbasaur, Squirtle</p>
+                    <div id="ranking-container"></div>
+                    <button id="submit-btn">Submit</button>
+                </div>
+                
+                <div id="result-message"></div>
+                
+                <div class="nav-buttons">
+                    <button id="ranking-back-btn">⬅ Back</button>
+                    <button id="comparison-btn">➡ Go to Comparison</button>
+                </div>
+            </div>
+            
+            <!-- Comparison Page -->
+            <div id="comparison-page" class="game-page" style="display: none;">
+                <h2>Comparison Page</h2>
+                <p>Here's how two Pokémon compare in attack and defense:</p>
+                
+                <div id="comparison-container" class="comparison-grid">
+                    <!-- Pokemon comparisons will be inserted here -->
+                </div>
+                
+                <div class="nav-buttons">
+                    <button id="comparison-back-btn">⬅ Back to Rankings</button>
+                    <button id="home-btn">🏠 Home</button>
+                </div>
+            </div>
+        </div>
+        
+        <div id="output" class="terminal"></div>
     </div>
+    
     <script src="main.js"></script>
 </body>
 </html>

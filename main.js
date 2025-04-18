@@ -12,6 +12,7 @@ async function main() {
         // Redirect Python stdout to our output div
         pyodide.runPython(`
             import sys
+            import js
             from pyodide.ffi import create_proxy
             
             class PyodideOutput:

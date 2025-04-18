@@ -22,7 +22,7 @@ async function main() {
                 
                 def write(self, text):
                     self.buffer += text
-                    element = document.getElementById(self.element_id)
+                    element = js.document.getElementById(self.element_id)
                     element.textContent = self.buffer
                     return len(text)
                 

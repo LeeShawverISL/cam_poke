@@ -45,6 +45,13 @@ async function main() {
             console.log("Is start_game a function?", typeof window.python.start_game);
             
             console.log("Python window object after initialization:", window.python);
+
+            if (!window.python || typeof window.python.start_game !== 'function') {
+                console.error("Python functions not available or not properly exported");
+                loadingElement.textContent = "Error: Game functions not available";
+                return;
+            }
+
             if (!window.python) {
                 console.error("Python functions were not properly exposed to JavaScript");
                 loadingElement.textContent = "Error: Python functions not available";

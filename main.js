@@ -150,10 +150,22 @@ function hideAllPages() {
 
 // Start game with selected mode
 function startGame(mode) {
-    // Call Python function to start game
-    const levelData = window.python.start_game(mode);
-    updateRankingsPage(levelData);
-    showRankingsPage();
+    console.log("Starting game with mode:", mode);
+    console.log("window.python:", window.python);
+    
+    if (!window.python || typeof window.python.start_game !== 'function') {
+        console.error("start_game function not available");
+        return;
+    }
+    
+    try {
+        const levelData = window.python.start_game(mode);
+        console.log("Got level data:", levelData);
+        updateRankingsPage(levelData);
+        showRankingsPage();
+    } catch (error) {
+        console.error("Error starting game:", error);
+    }
 }
 
 // Update the rankings page with current level data

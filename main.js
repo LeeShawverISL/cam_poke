@@ -10,9 +10,10 @@ async function main() {
         loadingElement.textContent = "Python environment loaded! Loading game...";
         
         // Redirect Python stdout to our output div
+        // Redirect Python stdout to our output div
         pyodide.runPython(`
             import sys
-            import js
+            import js  // Add this import
             from pyodide.ffi import create_proxy
             
             class PyodideOutput:
@@ -22,7 +23,7 @@ async function main() {
                 
                 def write(self, text):
                     self.buffer += text
-                    element = js.document.getElementById(self.element_id)
+                    element = js.document.getElementById(self.element_id)  // Use js.document instead
                     element.textContent = self.buffer
                     return len(text)
                 

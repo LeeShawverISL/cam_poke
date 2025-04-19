@@ -40,6 +40,9 @@ async function main() {
         loadingElement.textContent = "Running game code...";
         try {
             await pyodide.runPythonAsync(pythonCode);
+
+            console.log("window.python contents:", window.python);
+            console.log("Is start_game a function?", typeof window.python.start_game);
             
             console.log("Python window object after initialization:", window.python);
             if (!window.python) {

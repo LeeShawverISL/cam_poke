@@ -89,15 +89,8 @@ def init_game():
         "check_ranking": create_proxy(check_ranking),
         "get_comparison_data": create_proxy(get_comparison_data)
     }
-    # Expose Python functions to JavaScript
-js.window.python = {
-    "get_pokemon_data": create_proxy(get_pokemon_data),
-    "start_game": create_proxy(start_game),
-    "get_level_data": create_proxy(get_level_data),
-    "check_ranking": create_proxy(check_ranking),
-    "get_comparison_data": create_proxy(get_comparison_data)
-}
-print("Python functions exposed to JavaScript with keys:", list(js.window.python.keys()))
+    
+    print("Python functions exposed to JavaScript with keys:", list(js.window.python.keys()))
     
 print("Game ready! You can now interact with the Pokémon Ranking Game.")
 

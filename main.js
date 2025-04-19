@@ -38,14 +38,34 @@ async function main() {
         const pythonCode = await response.text();
         
         loadingElement.textContent = "Running game code...";
-        await pyodide.runPythonAsync(pythonCode);
-        
-        // Hide loading message and show game
-        loadingElement.textContent = "";
-        document.getElementById("game-container").style.display = "block";
-        
-        // Initialize UI and event handlers
-        initializeGameUI();
+       try {
+            await pyodide.runPythonAsync(pythonCode);
+            
+            console.log("Python window object after initialization:", window.python);
+            if (!window.python) {
+                console.error("Python functions were not properly exposed to JavaScript");
+                loadingElement.textContent = "Error: Python functions not available";
+                return;
+            }
+            
+            // Hide loading message and show game
+            loadingElement.textContent = "";
+            document.getElementById("game-container").style.display = "block";
+            
+            // Initialize UI and event handlers
+            initializeGameUI();
+       } catch (error) {
+    console.error("Python execution error:", error);
+    loadingElement.textContent = "Error loading game: " + error.message;
+    
+    // Try to get more details about the error from Python
+    try {
+        const errorDetails = pyodide.runPython("import sys; sys.last_traceback");
+        console.error("Python traceback:", errorDetails);
+    } catch (e) {
+        console.error("Could not get Python traceback:", e);
+    }
+}
     } catch (error) {
         console.error("Python execution error:", error);
         loadingElement.textContent = "Error loading game: " + error.message;

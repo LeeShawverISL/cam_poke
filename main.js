@@ -37,22 +37,24 @@ async function main() {
         const pythonCode = await response.text();
         await pyodide.runPythonAsync(pythonCode);
         
-        // ✅ Correct way to convert Python-exposed JS proxy into usable JS functions
+        // ✅ FIX: Extract real JS-callable functions from the Pyodide proxy
         try {
-            const jsPython = pyodide.globals.get("js").get("window").get("python");
+            const jsWindow = pyodide.globals.get("js").get("window");
+            const proxy = jsWindow.get("python");
         
             window.python = {
-                get_pokemon_data: jsPython.get("get_pokemon_data").callable,
-                start_game: jsPython.get("start_game").callable,
-                get_level_data: jsPython.get("get_level_data").callable,
-                check_ranking: jsPython.get("check_ranking").callable,
-                get_comparison_data: jsPython.get("get_comparison_data").callable,
+                get_pokemon_data: proxy.get("get_pokemon_data"),
+                start_game: proxy.get("start_game"),
+                get_level_data: proxy.get("get_level_data"),
+                check_ranking: proxy.get("check_ranking"),
+                get_comparison_data: proxy.get("get_comparison_data")
             };
         
-            console.log("✅ Python functions copied into JS window.python");
-        
+            console.log("✅ Successfully unwrapped Python functions");
         } catch (e) {
-            console.error("Error accessing js.window.python:", e);
+            console.error("❌ Error unwrapping Python functions:", e);
+            loadingElement.textContent = "Error: Failed to access Python functions";
+            return;
         }
         
         console.log("window.python contents:", window.python);
@@ -63,7 +65,6 @@ async function main() {
             loadingElement.textContent = "Error: Game functions not available";
             return;
         }
-
 
         // All good — hide loader and show game
         loadingElement.textContent = "";

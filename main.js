@@ -32,34 +32,27 @@ async function main() {
             sys.stderr = PyodideOutput("output")
         `);
 
-        // Fetch and run your Python game logic
+        // Load and run Python game logic
         const response = await fetch("python/main.py");
         const pythonCode = await response.text();
         await pyodide.runPythonAsync(pythonCode);
-        
-        // ✅ FIX: Extract real JS-callable functions from the Pyodide proxy
-        try {
-            const jsWindow = pyodide.globals.get("js").get("window");
-            const proxy = jsWindow.get("python");
-        
-            window.python = {
-                get_pokemon_data: proxy.get("get_pokemon_data"),
-                start_game: proxy.get("start_game"),
-                get_level_data: proxy.get("get_level_data"),
-                check_ranking: proxy.get("check_ranking"),
-                get_comparison_data: proxy.get("get_comparison_data")
-            };
-        
-            console.log("✅ Successfully unwrapped Python functions");
-        } catch (e) {
-            console.error("❌ Error unwrapping Python functions:", e);
-            loadingElement.textContent = "Error: Failed to access Python functions";
-            return;
-        }
-        
+
+        // Extract Python-exposed functions into JS
+        const jsWindow = pyodide.globals.get("js").get("window");
+        const proxy = jsWindow.get("python");
+
+        window.python = {
+            get_pokemon_data: proxy.get("get_pokemon_data"),
+            start_game: proxy.get("start_game"),
+            get_level_data: proxy.get("get_level_data"),
+            check_ranking: proxy.get("check_ranking"),
+            get_comparison_data: proxy.get("get_comparison_data")
+        };
+
+        console.log("✅ Successfully unwrapped Python functions");
         console.log("window.python contents:", window.python);
         console.log("Is start_game a function?", typeof window.python?.start_game);
-        
+
         if (!window.python || typeof window.python.start_game !== "function") {
             console.error("Python functions not available or not properly exported");
             loadingElement.textContent = "Error: Game functions not available";

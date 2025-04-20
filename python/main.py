@@ -1,8 +1,9 @@
 import random
 import js
+import asyncio
 from pyodide.ffi import create_proxy
 
-# Sample Pokémon data
+# Pokémon data
 pokemon_data = [
     {"name": "Pikachu", "attack": 55, "defense": 40},
     {"name": "Charmander", "attack": 52, "defense": 43},
@@ -22,55 +23,53 @@ game_state = {
     "sample": [],
 }
 
-def init_game():
-    print("Pokémon Ranking Game initialized!")
-    
-    def get_pokemon_data():
-        return pokemon_data
+def get_pokemon_data():
+    return pokemon_data
 
-    def start_game(mode):
-        game_state["current_mode"] = mode
+def start_game(mode):
+    game_state["current_mode"] = mode
+    game_state["current_level"] = 1
+    game_state["points"] = 0
+    return get_level_data()
+
+def get_level_data():
+    game_state["sample"] = random.sample(pokemon_data, 3)
+    return {
+        "pokemon": game_state["sample"],
+        "level": game_state["current_level"],
+        "mode": game_state["current_mode"],
+        "points": game_state["points"]
+    }
+
+def check_ranking(user_order):
+    correct_order = sorted(game_state["sample"], key=lambda x: x['attack'], reverse=True)
+    correct = [p['name'] for p in correct_order] == user_order
+
+    if correct:
+        game_state["points"] += 10
+
+    game_state["current_level"] += 1
+    level_complete = game_state["current_level"] > 3
+    if level_complete:
         game_state["current_level"] = 1
-        game_state["points"] = 0
-        return get_level_data()
 
-    def get_level_data():
-        game_state["sample"] = random.sample(pokemon_data, 3)
-        return {
-            "pokemon": game_state["sample"],
-            "level": game_state["current_level"],
-            "mode": game_state["current_mode"],
-            "points": game_state["points"]
-        }
+    return {
+        "correct": correct,
+        "correct_order": [p['name'] for p in correct_order],
+        "points": game_state["points"],
+        "level_complete": level_complete
+    }
 
-    def check_ranking(user_order):
-        correct_order = sorted(game_state["sample"], key=lambda x: x['attack'], reverse=True)
-        correct = [p['name'] for p in correct_order] == user_order
+def get_comparison_data():
+    poke1, poke2 = random.sample(pokemon_data, 2)
+    return {
+        "pokemon1": poke1,
+        "pokemon2": poke2
+    }
 
-        if correct:
-            game_state["points"] += 10
+async def expose_functions():
+    await asyncio.sleep(0.1)  # Small delay to ensure JS environment is ready
 
-        game_state["current_level"] += 1
-        level_complete = game_state["current_level"] > 3
-
-        if level_complete:
-            game_state["current_level"] = 1
-
-        return {
-            "correct": correct,
-            "correct_order": [p['name'] for p in correct_order],
-            "points": game_state["points"],
-            "level_complete": level_complete
-        }
-
-    def get_comparison_data():
-        poke1, poke2 = random.sample(pokemon_data, 2)
-        return {
-            "pokemon1": poke1,
-            "pokemon2": poke2
-        }
-
-    # ✅ Expose functions here
     js.window.python = {
         "get_pokemon_data": create_proxy(get_pokemon_data),
         "start_game": create_proxy(start_game),
@@ -79,8 +78,9 @@ def init_game():
         "get_comparison_data": create_proxy(get_comparison_data)
     }
 
-    print("Python functions exposed to JavaScript with keys:", list(js.window.python.keys()))
+    print("✅ Python functions exposed to JavaScript with keys:", list(js.window.python.keys()))
 
-# ✅ Initialize game
-init_game()
-print("Game initialization complete")
+# Run init logic
+print("Initializing Pokémon Ranking Game...")
+asyncio.ensure_future(expose_functions())
+print("Game initialization complete.")

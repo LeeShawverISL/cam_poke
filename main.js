@@ -36,23 +36,34 @@ async function main() {
         const response = await fetch("python/main.py");
         const pythonCode = await response.text();
         await pyodide.runPythonAsync(pythonCode);
-
-        // Pull Python-exposed functions from Pyodide
+        
+        // ✅ Correct way to convert Python-exposed JS proxy into usable JS functions
         try {
-            // Access the raw Python object from js.window.python
-            window.python = pyodide.runPython("js.window.python");
+            const jsPython = pyodide.globals.get("js").get("window").get("python");
+        
+            window.python = {
+                get_pokemon_data: jsPython.get("get_pokemon_data").callable,
+                start_game: jsPython.get("start_game").callable,
+                get_level_data: jsPython.get("get_level_data").callable,
+                check_ranking: jsPython.get("check_ranking").callable,
+                get_comparison_data: jsPython.get("get_comparison_data").callable,
+            };
+        
+            console.log("✅ Python functions copied into JS window.python");
+        
         } catch (e) {
             console.error("Error accessing js.window.python:", e);
         }
-
+        
         console.log("window.python contents:", window.python);
         console.log("Is start_game a function?", typeof window.python?.start_game);
-
+        
         if (!window.python || typeof window.python.start_game !== "function") {
             console.error("Python functions not available or not properly exported");
             loadingElement.textContent = "Error: Game functions not available";
             return;
         }
+
 
         // All good — hide loader and show game
         loadingElement.textContent = "";

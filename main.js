@@ -39,12 +39,8 @@ async function main() {
 
         // Pull Python-exposed functions from Pyodide
         try {
-            const jsObj = pyodide.globals.get("js");
-            if (jsObj && jsObj.window && jsObj.window.python) {
-                window.python = jsObj.window.python;
-            } else {
-                console.error("js.window.python not found in pyodide scope");
-            }
+            // Access the raw Python object from js.window.python
+            window.python = pyodide.runPython("js.window.python");
         } catch (e) {
             console.error("Error accessing js.window.python:", e);
         }

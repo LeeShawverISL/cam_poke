@@ -38,26 +38,31 @@ async function main() {
         await pyodide.runPythonAsync(pythonCode);
 
         // Extract Python-exposed functions into JS
-        const jsWindow = pyodide.globals.get("js").get("window");
-        const proxy = jsWindow.get("python");
-
+        // Load and run Python code
+        const response = await fetch("python/main.py");
+        const pythonCode = await response.text();
+        await pyodide.runPythonAsync(pythonCode);
+        
+        // ✅ Pyodide 0.24+ compatible access to js.window.python
+        const proxy = pyodide.globals.get("js").window.python;
+        
         window.python = {
-            get_pokemon_data: proxy.get("get_pokemon_data"),
-            start_game: proxy.get("start_game"),
-            get_level_data: proxy.get("get_level_data"),
-            check_ranking: proxy.get("check_ranking"),
-            get_comparison_data: proxy.get("get_comparison_data")
+            get_pokemon_data: proxy.get_pokemon_data,
+            start_game: proxy.start_game,
+            get_level_data: proxy.get_level_data,
+            check_ranking: proxy.check_ranking,
+            get_comparison_data: proxy.get_comparison_data
         };
-
+        
         console.log("✅ Successfully unwrapped Python functions");
-        console.log("window.python contents:", window.python);
         console.log("Is start_game a function?", typeof window.python?.start_game);
-
+        
         if (!window.python || typeof window.python.start_game !== "function") {
             console.error("Python functions not available or not properly exported");
             loadingElement.textContent = "Error: Game functions not available";
             return;
         }
+
 
         // All good — hide loader and show game
         loadingElement.textContent = "";

@@ -1,6 +1,5 @@
 import random
 import js
-import asyncio
 from pyodide.ffi import create_proxy
 
 # Pokémon data
@@ -67,9 +66,8 @@ def get_comparison_data():
         "pokemon2": poke2
     }
 
-async def expose_functions():
-    await asyncio.sleep(0.1)  # Small delay to ensure JS environment is ready
-
+# Expose immediately
+def expose_functions():
     js.window.python = {
         "get_pokemon_data": create_proxy(get_pokemon_data),
         "start_game": create_proxy(start_game),
@@ -80,7 +78,6 @@ async def expose_functions():
 
     print("✅ Python functions exposed to JavaScript with keys:", list(js.window.python.keys()))
 
-# Run init logic
 print("Initializing Pokémon Ranking Game...")
-asyncio.ensure_future(expose_functions())
+expose_functions()
 print("Game initialization complete.")
